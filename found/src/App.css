@@ -1,5 +1,7 @@
 /* ========== Landing ========== */
 .landing {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,7 +9,43 @@
   min-height: 100svh;
   padding: 2rem 1.5rem;
   text-align: center;
+  
 }
+
+.landing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, var(--bg) 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(70,50,180,0.25) 0%, rgba(160,100,220,0.1) 50%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(160,100,220,0.18);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+.ring-1 { width: 320px; height: 320px; }
+.ring-2 { width: 460px; height: 460px; border-color: rgba(160,100,220,0.1); }
+.ring-3 { width: 600px; height: 600px; border-color: rgba(160,100,220,0.06); }
 
 /* Gradient border (logo colors) around content */
 .landing-border {
@@ -19,7 +57,7 @@
       var(--logo-deep),
       var(--logo-gold),
       var(--logo-light));
-  max-width: 80rem;
+  min-height: 100svh; 
   width: 100%;
 }
 
@@ -29,20 +67,6 @@
   border-radius: 15px;
   padding: 2.5rem 2rem;
   overflow: hidden;
-}
-
-/* Faded logo as background behind title */
-.landing-logo-bg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  max-width: 200px;
-  height: auto;
-  opacity: 0.22;
-  pointer-events: none;
-  z-index: 0;
 }
 
 .landing-content {
@@ -70,6 +94,10 @@
 
 .landing-star path {
   fill: var(--logo-gold);
+}
+.brand-logo {
+  width: 40%;
+  margin-bottom: 2rem;
 }
 
 .landing-arc {
@@ -101,15 +129,17 @@
 }
 
 .brand {
-  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-size: clamp(4rem, 8vw, 5rem);
+  font-family: "Google Sans", sans-serif;
   font-weight: 600;
   letter-spacing: -0.02em;
-  margin: 0;
+  margin: 100 0 0.25rem;
   color: var(--text-h);
 }
 
 .tagline {
   font-size: 1.25rem;
+  font-family: "Google Sans", sans-serif;
   color: var(--logo-mid);
   margin: 0 0 1.5rem;
   font-weight: 500;
@@ -125,18 +155,21 @@
 .cta {
   font-size: 1rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 9999px;
   color: #fff;
   background: linear-gradient(135deg, var(--logo-mid), var(--logo-deep));
   border: none;
   cursor: pointer;
   font-weight: 500;
-  transition: opacity 0.2s, transform 0.15s;
 }
-
 .cta:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
+  opacity: 0.7 !important;
+}
+.cta {
+  transition: opacity 0.5s ease, transform 0.15s;
+}
+.cta-wrap {
+  animation: fadeSlideUp 0.7s ease 0.45s both;
 }
 
 .cta:focus-visible {
@@ -173,6 +206,7 @@
   padding: 1.5rem;
   width: 100%;
   max-width: 24rem;
+  max-height: 28rem;
   box-shadow: var(--shadow);
   position: relative;
   animation: modalSlideUp 0.25s ease;
@@ -227,7 +261,7 @@
 .lost-form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .lost-form label {
@@ -238,12 +272,13 @@
 }
 
 .lost-form input {
-  padding: 0.6rem 0.75rem;
+  padding: 0.3rem 0.45rem;
   border: 1px solid var(--border);
   border-radius: 6px;
   font: inherit;
   background: var(--bg);
   color: var(--text-h);
+  font-size: 0.85rem;
 }
 
 .lost-form input::placeholder {
@@ -277,4 +312,94 @@
 .lost-form-submit:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+* {
+  font-family: 'Nunito Sans', sans-serif;
+}
+.top-nav {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  position: absolute;
+  top: 20px;
+  left: 24px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.nav-name {
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: "Google Sans", sans-serif;
+  color: var(--text-h);
+}
+/* ========== Load-in Animations ========== */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.brand-wrap {
+  animation: fadeSlideUp 0.7s ease both;
+}
+
+.tagline {
+  animation: fadeSlideUp 0.7s ease 0.15s both;
+}
+
+.description {
+  animation: fadeSlideUp 0.7s ease 0.3s both;
+}
+
+
+
+.nav-brand {
+  animation: fadeIn 0.6s ease 0.1s both;
+}
+.top-nav {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.nav-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-h);
+  text-decoration: none;
+  font-family: "Google Sans", sans-serif;
+  transition: opacity 0.2s;
+}
+
+.nav-link:hover {
+  opacity: 0.6;
 }
