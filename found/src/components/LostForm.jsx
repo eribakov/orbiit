@@ -1,7 +1,5 @@
 import { Fragment } from 'react'
-
-// Replace with your Formspree form ID from https://formspree.io
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xpqyjeoq'
+import { supabase } from '...src/supabaseClient.js'
 
 const FIELDS = [
   { id: 'name', name: 'name', label: 'Name', placeholder: 'Your name' },
