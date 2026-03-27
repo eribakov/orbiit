@@ -2,20 +2,28 @@ import { useState } from 'react'
 import Landing from './components/Landing'
 import Modal from './components/Modal'
 import LostForm from './components/LostForm'
+import FoundForm from './components/FoundForm'
 import './App.css'
 
 export default function App() {
-  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [modalMode, setModalMode] = useState(null)
 
   return (
     <>
-      <Landing onReportClick={() => setIsFormOpen(true)} />
+      <Landing
+        onLostClick={() => setModalMode('lost')}
+        onFoundClick={() => setModalMode('found')}
+      />
       <Modal
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        title="Report something lost"
+        isOpen={modalMode !== null}
+        onClose={() => setModalMode(null)}
+        title={
+          modalMode === 'found'
+            ? 'Report something found'
+            : 'Report something lost'
+        }
       >
-        <LostForm />
+        {modalMode === 'found' ? <FoundForm /> : <LostForm />}
       </Modal>
     </>
   )

@@ -1,4 +1,4 @@
-export default function Landing({ onReportClick }) {
+export default function Landing({ onLostClick, onFoundClick }) {
   return (
     <main className="landing">
       <div className="orb" />
@@ -15,7 +15,7 @@ export default function Landing({ onReportClick }) {
           <a href="mailto:orbiitsupport@gmail.com" className="nav-link">Contact Us</a>
         </div>
       </nav>
-      
+
       <div className="landing-content">
         <div className="brand-wrap">
           <img src="/Orbiit Logo.png" alt="Orbiit logo" className="brand-logo" />
@@ -27,8 +27,11 @@ export default function Landing({ onReportClick }) {
           for lost items, found items, and good Samaritans.
         </p>
         <div className="cta-wrap">
-          <button type="button" className="cta" onClick={onReportClick}>
+          <button type="button" className="cta" onClick={onLostClick}>
             Report something lost
+          </button>
+          <button type="button" className="cta" onClick={onFoundClick}>
+            Report something found
           </button>
         </div>
       </div>

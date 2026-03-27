@@ -1,25 +1,26 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../supabaseClient'
 
+
 const FIELDS = [
   { id: 'name', name: 'name', label: 'Name', placeholder: 'Your name' },
   { id: 'contact', name: 'contact', label: 'Contact info', placeholder: 'Email' },
-  { id: 'what_lost', name: 'what_lost', label: 'What did you lose?', placeholder: 'e.g. keys, wallet, bag' },
+  { id: 'what_found', name: 'what_found', label: 'What did you find?', placeholder: 'e.g. keys, wallet, bag' },
   { id: 'item_desc', name: 'item_desc', label: 'Item description', placeholder: 'Give a brief description of your item including any distinguishing features' },
-  { id: 'lost_location', name: 'lost_location', label: 'Where did you lose it?', placeholder: 'e.g. Central Park, bus line 42' },
-  { id: 'date_lost', name: 'date_lost', label: 'Date lost (optional)', type: 'date', optional: true },
+  { id: 'where_found', name: 'where_found', label: 'Where did you find it?', placeholder: 'e.g. Central Park, bus line 42' },
+  { id: 'date_found', name: 'date_found', label: 'Date found', type: 'date', optional: true },
 ]
 
 const emptyForm = () => ({
   name: '',
   contact: '',
-  what_lost: '',
+  what_found: '',
   item_desc: '',
-  lost_location: '',
-  date_lost: '',
+  where_found: '',
+  date_found: '',
 })
 
-export default function LostForm() {
+export default function FoundForm() {
   const [formData, setFormData] = useState(emptyForm)
   const [images, setImages] = useState([null, null, null])
   const [loading, setLoading] = useState(false)
@@ -47,7 +48,7 @@ export default function LostForm() {
     const u = [...images]
     u[i] = null
     setImages(u)
-    const input = document.getElementById(`lost-image-upload-${i}`)
+    const input = document.getElementById(`image-upload-${i}`)
     if (input) input.value = ''
   }
 
@@ -59,7 +60,7 @@ export default function LostForm() {
     const imageUrls = []
     for (const image of images) {
       if (image) {
-        const fileName = `lost/${Date.now()}-${image.name}`
+        const fileName = `found/${Date.now()}-${image.name}`
         const { data, error: uploadError } = await supabase.storage
           .from('item-photos')
           .upload(fileName, image)
@@ -78,18 +79,18 @@ export default function LostForm() {
     const payload = {
       name: formData.name,
       contact: formData.contact,
-      what_lost: formData.what_lost,
+      what_found: formData.what_found,
       item_desc: formData.item_desc,
-      lost_location: formData.lost_location,
+      where_found: formData.where_found,
       photo_url_1: imageUrls[0],
       photo_url_2: imageUrls[1],
       photo_url_3: imageUrls[2],
     }
-    if (formData.date_lost) {
-      payload.date_lost = formData.date_lost
+    if (formData.date_found) {
+      payload.date_found = formData.date_found
     }
 
-    const { error: insertError } = await supabase.from('lost_items').insert(payload)
+    const { error: insertError } = await supabase.from('found_items').insert(payload)
 
     if (insertError) {
       setError(insertError.message)
@@ -105,8 +106,8 @@ export default function LostForm() {
   if (success) return <p>Your item has been submitted!</p>
 
   return (
-    <form onSubmit={handleSubmit} className="lost-form">
-      {error && <p className="lost-form-error" role="alert">{error}</p>}
+    <form onSubmit={handleSubmit} className="found-form">
+      {error && <p className="found-form-error" role="alert">{error}</p>}
 
       {FIELDS.map(({ id, name, label, placeholder, type, optional }) => (
         <Fragment key={id}>
@@ -115,7 +116,7 @@ export default function LostForm() {
             id={id}
             name={name}
             type={type || 'text'}
-            required={!optional}
+            required={optional !== true}
             placeholder={placeholder}
             value={formData[name]}
             onChange={handleChange}
@@ -123,8 +124,21 @@ export default function LostForm() {
         </Fragment>
       ))}
 
-      <div className="lost-form-photos-wrap">
-        <label>Photos (optional)</label>
+      <div className="found-form-photos-wrap">
+        <label id="found-photos-label">
+          Photos <span className="found-form-hint">(at least one required)</span>
+        </label>
+        <input
+          className="found-form-photo-gate"
+          type="text"
+          name="photo_gate"
+          aria-label="Add at least one photo to continue"
+          tabIndex={-1}
+          autoComplete="off"
+          value={images.some(Boolean) ? 'ok' : ''}
+          onChange={() => { }}
+          required
+        />
         {[0, 1, 2].map((i) => (
           <div
             key={i}
@@ -139,10 +153,10 @@ export default function LostForm() {
               setImages(updated)
             }}
             onDragOver={(e) => e.preventDefault()}
-            onClick={() => document.getElementById(`lost-image-upload-${i}`).click()}
+            onClick={() => document.getElementById(`image-upload-${i}`).click()}
           >
             <input
-              id={`lost-image-upload-${i}`}
+              id={`image-upload-${i}`}
               type="file"
               accept="image/*"
               style={{ display: 'none' }}
@@ -185,7 +199,7 @@ export default function LostForm() {
         ))}
       </div>
 
-      <button type="submit" className="lost-form-submit" disabled={loading}>
+      <button type="submit" className="found-form-submit" disabled={loading}>
         {loading ? 'Submitting...' : 'Submit'}
       </button>
     </form>
