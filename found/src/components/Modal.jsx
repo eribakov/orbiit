@@ -22,25 +22,20 @@ export default function Modal({ isOpen, onClose, title, children }) {
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
-      <div
-        className="modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {title && (
-          <h2 id="modal-title" className="modal-title">
-            {title}
-          </h2>
-        )}
-        <button
-          type="button"
-          className="modal-close"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          ×
-        </button>
-        {children}
-      </div>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+  {title && (
+    <h2 id="modal-title" className="modal-title">
+      {title}
+    </h2>
+  )}
+  <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+    ×
+  </button>
+  <div className="modal-scroll">
+    {children}
+  </div>
+</div>
+
     </div>
   )
 }
