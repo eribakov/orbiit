@@ -5,7 +5,7 @@ const FIELDS = [
   { id: 'name', name: 'name', label: 'Name', placeholder: 'Your name' },
   { id: 'contact', name: 'contact', label: 'Contact info', placeholder: 'Email' },
   { id: 'what_lost', name: 'what_lost', label: 'What did you lose?', placeholder: 'e.g. keys, wallet, bag' },
-  { id: 'item_desc', name: 'item_desc', label: 'Item description', placeholder: 'Give a brief description of your item including any distinguishing features' },
+  { id: 'item_desc', name: 'item_desc', label: 'Item description', placeholder: 'Give a brief description of your item' },
   { id: 'lost_location', name: 'lost_location', label: 'Where did you lose it?', placeholder: 'e.g. Central Park, bus line 42' },
   { id: 'date_lost', name: 'date_lost', label: 'Date lost (optional)', type: 'date', optional: true },
 ]
