@@ -25,11 +25,8 @@ export default function Landing({ onLostClick, onFoundClick, user }) {
             </button>
           ) : (
             <>
-              <Link to="/login" className="nav-link nav-link-btn">
-                Log in
-              </Link>
-              <Link to="/signup" className="nav-link nav-link-btn">
-                Sign up
+              <Link to="/auth" className="nav-link nav-link-btn">
+                Login / Sign up
               </Link>
               <Link to="/account" className="nav-link">
                 Account

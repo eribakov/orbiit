@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import Landing from './pages/Landing'
 import AccountPage from './pages/AccountPage'
 import Modal from './components/Modal'
 import LostForm from './pages/LostForm'
 import FoundForm from './pages/FoundForm'
-import LoginPage from './components/LoginPage'
-import SignPage from './components/SignPage'
+import AuthPage from './pages/AuthPage'
 import './App.css'
 
 function HomePage() {
@@ -53,8 +52,9 @@ export default function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/account" element={<AccountPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignPage />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/login" element={<Navigate to="/auth" replace />} />
+      <Route path="/signup" element={<Navigate to="/auth?signup=1" replace />} />
     </Routes>
   )
 }
