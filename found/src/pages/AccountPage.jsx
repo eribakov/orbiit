@@ -164,12 +164,13 @@ export default function AccountPage() {
             </div>
           </div>
           <button
-            type="button"
-            className="account-edit-btn"
-            disabled={loading || !user}
-          >
-            Edit profile
-          </button>
+  type="button"
+  className="account-edit-btn"
+  disabled={loading || !user}
+  onClick={() => navigate('/edit-profile')}
+>
+  Edit profile
+</button>
         </header>
 
         {!loading && !user && (

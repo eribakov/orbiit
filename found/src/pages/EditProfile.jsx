@@ -86,9 +86,11 @@ export default function EditProfilePage() {
     }
 
     const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ name: fullName })
-      .eq('id', user.id)
+  .from('profiles')
+  .upsert({ id: user.id, name: fullName })
+  await supabase.auth.updateUser({
+  data: { name: fullName }
+})
 
     if (profileError) { setError(profileError.message); setLoading(false); return }
 
