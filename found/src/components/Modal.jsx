@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, children, backdropClassName = '' }) {
   useEffect(() => {
     if (!isOpen) return
     const handleEscape = (e) => e.key === 'Escape' && onClose()
@@ -16,7 +16,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
 
   return (
     <div
-      className="modal-backdrop"
+      className={['modal-backdrop', backdropClassName].filter(Boolean).join(' ')}
       onClick={onClose}
       role="dialog"
       aria-modal="true"

@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import emailjs from '@emailjs/browser'
 import { supabase } from '../supabaseClient'
 import TrackReportModal from '../components/TrackReportModal'
+
 
 const FIELDS = [
   { id: 'name', name: 'name', label: 'Name', placeholder: 'Your name' },
@@ -26,7 +28,7 @@ export default function FoundForm() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
-  const [trackModalOpen, setTrackModalOpen] = useState(false)
+  const [showTrackModal, setShowTrackModal] = useState(false)
 
   const previewUrls = useMemo(
     () => images.map((file) => (file ? URL.createObjectURL(file) : null)),
@@ -53,7 +55,7 @@ export default function FoundForm() {
     if (input) input.value = ''
   }
 
-  const runSubmit = async (userId) => {
+  const performSubmit = async (userId) => {
     setLoading(true)
     setError(null)
 
@@ -77,7 +79,7 @@ export default function FoundForm() {
     }
 
     const payload = {
-      user_id: userId,
+      user_id: userId ?? null,
       name: formData.name,
       contact: formData.contact,
       what_found: formData.what_found,
@@ -96,6 +98,30 @@ export default function FoundForm() {
     if (insertError) {
       setError(insertError.message)
     } else {
+      if (!userId) {
+        console.log('Sending email to:', formData.contact)
+        console.log(
+          'ENV check:',
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_FOUND_TEMPLATE_ID,
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        )
+        emailjs
+          .send(
+            import.meta.env.VITE_EMAILJS_SERVICE_ID,
+            import.meta.env.VITE_EMAILJS_FOUND_TEMPLATE_ID,
+            {
+              to_email: formData.contact,
+              name: formData.name,
+              item: formData.what_found,
+              location: formData.where_found,
+              date: formData.date_found || 'Not specified',
+            },
+            import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+          )
+          .then((result) => console.log('Email sent:', result))
+          .catch((error) => console.log('Email error:', error))
+      }
       setSuccess(true)
       setFormData(emptyForm())
       setImages([null, null, null])
@@ -112,124 +138,120 @@ export default function FoundForm() {
       data: { session },
     } = await supabase.auth.getSession()
     if (session?.user?.id) {
-      await runSubmit(session.user.id)
+      await performSubmit(session.user.id)
       return
     }
-    setTrackModalOpen(true)
-  }
 
-  const handleContinueWithoutAccount = async () => {
-    setTrackModalOpen(false)
-    await runSubmit(null)
+    setShowTrackModal(true)
   }
 
   if (success) return <p>Your item has been submitted!</p>
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="found-form">
-        {error && <p className="found-form-error" role="alert">{error}</p>}
+    <form onSubmit={handleSubmit} className="found-form">
+      <TrackReportModal
+        isOpen={showTrackModal}
+        onClose={() => setShowTrackModal(false)}
+        onContinueWithoutAccount={async () => {
+          setShowTrackModal(false)
+          await performSubmit(null)
+        }}
+      />
+      {error && <p className="found-form-error" role="alert">{error}</p>}
 
-        {FIELDS.map(({ id, name, label, placeholder, type, optional }) => (
-          <Fragment key={id}>
-            <label htmlFor={id}>{label}</label>
-            <input
-              id={id}
-              name={name}
-              type={type || 'text'}
-              required={optional !== true}
-              placeholder={placeholder}
-              value={formData[name]}
-              onChange={handleChange}
-            />
-          </Fragment>
-        ))}
-
-        <div className="found-form-photos-wrap">
-          <label id="found-photos-label">
-            Photos <span className="found-form-hint">(at least one required)</span>
-          </label>
+      {FIELDS.map(({ id, name, label, placeholder, type, optional }) => (
+        <Fragment key={id}>
+          <label htmlFor={id}>{label}</label>
           <input
-            className="found-form-photo-gate"
-            type="text"
-            name="photo_gate"
-            aria-label="Add at least one photo to continue"
-            tabIndex={-1}
-            autoComplete="off"
-            value={images.some(Boolean) ? 'ok' : ''}
-            onChange={() => { }}
-            required
+            id={id}
+            name={name}
+            type={type || 'text'}
+            required={optional !== true}
+            placeholder={placeholder}
+            value={formData[name]}
+            onChange={handleChange}
           />
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="dropzone"
-              onDrop={(e) => {
-                e.preventDefault()
+        </Fragment>
+      ))}
+
+      <div className="found-form-photos-wrap">
+        <label id="found-photos-label">
+          Photos <span className="found-form-hint">(at least one required)</span>
+        </label>
+        <input
+          className="found-form-photo-gate"
+          type="text"
+          name="photo_gate"
+          aria-label="Add at least one photo to continue"
+          tabIndex={-1}
+          autoComplete="off"
+          value={images.some(Boolean) ? 'ok' : ''}
+          onChange={() => { }}
+          required
+        />
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="dropzone"
+            onDrop={(e) => {
+              e.preventDefault()
+              setError(null)
+              const file = e.dataTransfer.files[0]
+              if (!file) return
+              const updated = [...images]
+              updated[i] = file
+              setImages(updated)
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onClick={() => document.getElementById(`image-upload-${i}`).click()}
+          >
+            <input
+              id={`image-upload-${i}`}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => {
                 setError(null)
-                const file = e.dataTransfer.files[0]
+                const file = e.target.files[0]
                 if (!file) return
                 const updated = [...images]
                 updated[i] = file
                 setImages(updated)
               }}
-              onDragOver={(e) => e.preventDefault()}
-              onClick={() => document.getElementById(`image-upload-${i}`).click()}
-            >
-              <input
-                id={`image-upload-${i}`}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  setError(null)
-                  const file = e.target.files[0]
-                  if (!file) return
-                  const updated = [...images]
-                  updated[i] = file
-                  setImages(updated)
-                }}
-              />
-              {images[i] ? (
-                <div className="dropzone-preview-wrap">
-                  <img
-                    src={previewUrls[i]}
-                    alt={`Preview ${i + 1}`}
-                    className="dropzone-preview-img"
-                  />
-                  <button
-                    type="button"
-                    className="dropzone-clear"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      clearImage(i)
-                    }}
-                    aria-label={`Remove photo ${i + 1}`}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <p className="dropzone-icon">📁</p>
-                  <p className="dropzone-text">Photo {i + 1}</p>
-                  <p className="dropzone-hint">drag & drop or click</p>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
+            />
+            {images[i] ? (
+              <div className="dropzone-preview-wrap">
+                <img
+                  src={previewUrls[i]}
+                  alt={`Preview ${i + 1}`}
+                  className="dropzone-preview-img"
+                />
+                <button
+                  type="button"
+                  className="dropzone-clear"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    clearImage(i)
+                  }}
+                  aria-label={`Remove photo ${i + 1}`}
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <>
+                <p className="dropzone-icon">📁</p>
+                <p className="dropzone-text">Photo {i + 1}</p>
+                <p className="dropzone-hint">drag & drop or click</p>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
 
-        <button type="submit" className="found-form-submit" disabled={loading}>
-          {loading ? 'Submitting...' : 'Submit'}
-        </button>
-      </form>
-
-      <TrackReportModal
-        isOpen={trackModalOpen}
-        onClose={() => setTrackModalOpen(false)}
-        onContinueWithoutAccount={handleContinueWithoutAccount}
-      />
-    </>
+      <button type="submit" className="found-form-submit" disabled={loading}>
+        {loading ? 'Submitting...' : 'Submit'}
+      </button>
+    </form>
   )
 }

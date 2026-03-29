@@ -1,63 +1,52 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Modal from './Modal'
 
-export default function TrackReportModal({
-  isOpen,
-  onClose,
-  onContinueWithoutAccount,
-}) {
-  useEffect(() => {
-    if (!isOpen) return
-    const onKey = (e) => {
-      if (e.key !== 'Escape') return
-      e.stopImmediatePropagation()
-      onClose()
+export default function TrackReportModal({ isOpen, onClose, onContinueWithoutAccount }) {
+  const navigate = useNavigate()
+  const [busy, setBusy] = useState(false)
+
+  const handleAuth = () => {
+    onClose()
+    navigate('/auth')
+  }
+
+  const handleContinue = async () => {
+    setBusy(true)
+    try {
+      await onContinueWithoutAccount()
+    } finally {
+      setBusy(false)
     }
-    document.addEventListener('keydown', onKey, true)
-    return () => document.removeEventListener('keydown', onKey, true)
-  }, [isOpen, onClose])
-
-  if (!isOpen) return null
+  }
 
   return (
-    <div
-      className="modal-backdrop modal-backdrop--stack"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="track-report-modal-title"
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Want to track this report?"
+      backdropClassName="modal-backdrop--elevated"
     >
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2 id="track-report-modal-title" className="modal-title">
-          Want to track this report?
-        </h2>
+      <p className="track-report-modal-body">
+        Sign in to see this report on your account page, or continue without an account.
+      </p>
+      <div className="track-report-modal-actions">
         <button
           type="button"
-          className="modal-close"
-          onClick={onClose}
-          aria-label="Close"
+          className="track-report-modal-btn track-report-modal-btn--primary"
+          onClick={handleAuth}
         >
-          ×
+          Login / Sign up
         </button>
-        <div className="modal-scroll">
-          <div className="track-report-modal-actions">
-            <Link
-              to="/auth"
-              className="track-report-modal-link"
-              onClick={onClose}
-            >
-              Login / Sign up
-            </Link>
-            <button
-              type="button"
-              className="track-report-modal-secondary"
-              onClick={onContinueWithoutAccount}
-            >
-              Continue without account
-            </button>
-          </div>
-        </div>
+        <button
+          type="button"
+          className="track-report-modal-btn track-report-modal-btn--secondary"
+          onClick={handleContinue}
+          disabled={busy}
+        >
+          {busy ? 'Submitting…' : 'Continue without account'}
+        </button>
       </div>
-    </div>
+    </Modal>
   )
 }
