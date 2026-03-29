@@ -155,7 +155,7 @@ export default function AuthPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName.trim() },
+        data: { name: fullName.trim() },
       },
     })
 
@@ -168,7 +168,7 @@ export default function AuthPage() {
     if (data.user) {
       await supabase.from('profiles').upsert({
         id: data.user.id,
-        full_name: fullName.trim(),
+        name: fullName.trim(),
         email,
       })
     }

@@ -6,6 +6,7 @@ import Modal from './components/Modal'
 import LostForm from './pages/LostForm'
 import FoundForm from './pages/FoundForm'
 import AuthPage from './pages/AuthPage'
+import EditProfile from './pages/EditProfile'
 import './App.css'
 
 function HomePage() {
@@ -38,8 +39,9 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/account" element={<AccountPage />} />
       <Route path="/auth" element={<AuthPage />} />
-      <Route path="/login" element={<Navigate to="/auth" replace />} />
-      <Route path="/signup" element={<Navigate to="/auth?signup=1" replace />} />
+      <Route path="/login" element={<Navigate to="/auth" />} />
+      <Route path="/signup" element={<Navigate to="/auth?signup=1" />} />
+      <Route path="/edit-profile" element={<EditProfile />} />
     </Routes>
   )
 }
