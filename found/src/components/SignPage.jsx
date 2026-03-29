@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 
-export default function SignPage({ onSuccess, onLoginClick }) {
+export default function SignPage() {
+  const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -145,6 +147,7 @@ export default function SignPage({ onSuccess, onLoginClick }) {
       color: var(--text-h);
       font-weight: 600;
     }
+    .auth-page-nav { position: absolute; top: 1rem; left: 1.5rem; z-index: 2; }
   `
 
   if (done) {
@@ -166,7 +169,7 @@ export default function SignPage({ onSuccess, onLoginClick }) {
             <p className="auth-subheading" style={{ marginBottom: '1.5rem' }}>
               We sent a confirmation link to <span className="auth-email-highlight">{email}</span>. Click it to activate your account.
             </p>
-            <button className="auth-submit" onClick={onLoginClick}>
+            <button type="button" className="auth-submit" onClick={() => navigate('/login')}>
               Back to log in
             </button>
           </div>
@@ -180,6 +183,9 @@ export default function SignPage({ onSuccess, onLoginClick }) {
       <style>{styles}</style>
 
       <div className="auth-page">
+        <nav className="auth-page-nav" aria-label="Site navigation">
+          <Link to="/" className="account-page-back">← Home</Link>
+        </nav>
         <div className="auth-orb" />
         <div className="auth-ring auth-ring-1" />
         <div className="auth-ring auth-ring-2" />
@@ -242,7 +248,7 @@ export default function SignPage({ onSuccess, onLoginClick }) {
 
           <p className="auth-switch">
             Already have an account?{' '}
-            <button className="auth-switch-link" onClick={onLoginClick}>Log in</button>
+            <button type="button" className="auth-switch-link" onClick={() => navigate('/login')}>Log in</button>
           </p>
         </div>
       </div>

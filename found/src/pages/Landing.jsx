@@ -1,11 +1,9 @@
-<<<<<<< HEAD:found/src/components/Landing.jsx
-export default function Landing({ onLostClick, onFoundClick, onLoginClick, onSignupClick, onAccountClick, user }) {  return (
-=======
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
-export default function Landing({ onLostClick, onFoundClick }) {
+export default function Landing({ onLostClick, onFoundClick, user }) {
+  const navigate = useNavigate()
+
   return (
->>>>>>> 62cb5beefa9198fa42165c71f9d8aae9dc69eebc:found/src/pages/Landing.jsx
     <main className="landing">
       <div className="orb" />
       <div className="ring ring-1" />
@@ -17,26 +15,39 @@ export default function Landing({ onLostClick, onFoundClick }) {
           <span className="nav-name">Orbiit</span>
         </div>
         <div className="nav-links">
-<<<<<<< HEAD:found/src/components/Landing.jsx
-  <a href="https://instagram.com/orbiit_qu" target="_blank" rel="noreferrer" className="nav-link">Instagram</a>
-  <a href="mailto:orbiitsupport@gmail.com" className="nav-link">Contact Us</a>
-  {user ? (
-    <button onClick={onAccountClick} className="nav-link nav-link-btn">My Account</button>
-  ) : (
-    <>
-      <button onClick={onLoginClick} className="nav-link nav-link-btn">Log in</button>
-      <button onClick={onSignupClick} className="nav-link nav-link-btn">Sign up</button>
-    </>
-  )}
-</div>
-=======
-          <Link to="/account" className="nav-link">
-            Account
-          </Link>
-          <a href="https://instagram.com/orbiit_qu" target="_blank" rel="noreferrer" className="nav-link">Instagram</a>
-          <a href="mailto:orbiitsupport@gmail.com" className="nav-link">Contact Us</a>
+          {user ? (
+            <button
+              type="button"
+              onClick={() => navigate('/account')}
+              className="nav-link nav-link-btn"
+            >
+              My Account
+            </button>
+          ) : (
+            <>
+              <Link to="/login" className="nav-link nav-link-btn">
+                Log in
+              </Link>
+              <Link to="/signup" className="nav-link nav-link-btn">
+                Sign up
+              </Link>
+              <Link to="/account" className="nav-link">
+                Account
+              </Link>
+            </>
+          )}
+          <a
+            href="https://instagram.com/orbiit_qu"
+            target="_blank"
+            rel="noreferrer"
+            className="nav-link"
+          >
+            Instagram
+          </a>
+          <a href="mailto:orbiitsupport@gmail.com" className="nav-link">
+            Contact Us
+          </a>
         </div>
->>>>>>> 62cb5beefa9198fa42165c71f9d8aae9dc69eebc:found/src/pages/Landing.jsx
       </nav>
 
       <div className="landing-content">

@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 
-export default function LoginPage({ onSuccess, onSignupClick }) {
+export default function LoginPage() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -13,7 +15,7 @@ export default function LoginPage({ onSuccess, onSignupClick }) {
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) setError(error.message)
-    else onSuccess?.()
+    else navigate('/')
     setLoading(false)
   }
 
@@ -111,9 +113,13 @@ export default function LoginPage({ onSuccess, onSignupClick }) {
         .auth-switch { margin-top: 1.25rem; font-size: 0.83rem; color: var(--text); text-align: center; }
         .auth-switch-link { color: var(--logo-mid); cursor: pointer; font-weight: 600; background: none; border: none; font: inherit; text-decoration: underline; }
         .auth-switch-link:hover { opacity: 0.7; }
+        .auth-page-nav { position: absolute; top: 1rem; left: 1.5rem; z-index: 2; }
       `}</style>
 
       <div className="auth-page">
+        <nav className="auth-page-nav" aria-label="Site navigation">
+          <Link to="/" className="account-page-back">← Home</Link>
+        </nav>
         <div className="auth-orb" />
         <div className="auth-ring auth-ring-1" />
         <div className="auth-ring auth-ring-2" />
@@ -157,7 +163,7 @@ export default function LoginPage({ onSuccess, onSignupClick }) {
 
           <p className="auth-switch">
             Don't have an account?{' '}
-            <button className="auth-switch-link" onClick={onSignupClick}>Sign up</button>
+            <button type="button" className="auth-switch-link" onClick={() => navigate('/signup')}>Sign up</button>
           </p>
         </div>
       </div>
