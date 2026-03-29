@@ -28,6 +28,28 @@ export default function LostForm() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
   const [showTrackModal, setShowTrackModal] = useState(false)
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return
+      setUser(session.user)
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', session.user.id)
+        .maybeSingle()
+
+      setFormData(prev => ({
+        ...prev,
+        name: profile?.name ?? session.user.user_metadata?.full_name ?? '',
+        contact: session.user.email ?? '',
+      }))
+    }
+    loadUser()
+  }, [])
 
   const previewUrls = useMemo(
     () => images.map((file) => (file ? URL.createObjectURL(file) : null)),
@@ -98,13 +120,6 @@ export default function LostForm() {
       setError(insertError.message)
     } else {
       if (!userId) {
-        console.log('Sending email to:', formData.contact)
-        console.log(
-          'ENV check:',
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_LOST_TEMPLATE_ID,
-          import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-        )
         emailjs
           .send(
             import.meta.env.VITE_EMAILJS_SERVICE_ID,
@@ -133,9 +148,7 @@ export default function LostForm() {
     e.preventDefault()
     setError(null)
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const { data: { session } } = await supabase.auth.getSession()
     if (session?.user?.id) {
       await performSubmit(session.user.id)
       return
@@ -158,20 +171,32 @@ export default function LostForm() {
       />
       {error && <p className="lost-form-error" role="alert">{error}</p>}
 
-      {FIELDS.map(({ id, name, label, placeholder, type, optional }) => (
-        <Fragment key={id}>
-          <label htmlFor={id}>{label}</label>
-          <input
-            id={id}
-            name={name}
-            type={type || 'text'}
-            required={!optional}
-            placeholder={placeholder}
-            value={formData[name]}
-            onChange={handleChange}
-          />
-        </Fragment>
-      ))}
+      {FIELDS.map(({ id, name, label, placeholder, type, optional }) => {
+        const isAutoFilled = user && (name === 'name' || name === 'contact')
+        return (
+          <Fragment key={id}>
+            <label htmlFor={id}>
+              {label}
+              {isAutoFilled && (
+                <span style={{ fontSize: '0.75rem', opacity: 0.5, marginLeft: '0.4rem' }}>
+                  (auto-filled)
+                </span>
+              )}
+            </label>
+            <input
+              id={id}
+              name={name}
+              type={type || 'text'}
+              required={!optional}
+              placeholder={placeholder}
+              value={formData[name]}
+              onChange={handleChange}
+              readOnly={isAutoFilled}
+              style={isAutoFilled ? { opacity: 0.7, cursor: 'default' } : {}}
+            />
+          </Fragment>
+        )
+      })}
 
       <div className="lost-form-photos-wrap">
         <label>Photos (optional)</label>
