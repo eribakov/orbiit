@@ -47,7 +47,7 @@ export default function EditProfilePage() {
     loadProfile()
   }, [])
 
-  const handleSave = async () => {
+const handleSave = async () => {
     setError('')
     setMessage('')
     setLoading(true)
@@ -86,18 +86,27 @@ export default function EditProfilePage() {
     }
 
     const { error: profileError } = await supabase
-  .from('profiles')
-  .upsert({ id: user.id, name: fullName })
-  await supabase.auth.updateUser({
-  data: { full_name: fullName }
-})
+      .from('profiles')
+      .upsert({ id: user.id, name: fullName })
 
     if (profileError) { setError(profileError.message); setLoading(false); return }
 
-    if (email !== user.email) {
-      const { error: emailError } = await supabase.auth.updateUser({ email })
-      if (emailError) { setError(emailError.message); setLoading(false); return }
-    }
+    const { error: authError } = await supabase.auth.updateUser({
+      data: { full_name: fullName }
+    })
+    if (authError) { setError(authError.message); setLoading(false); return }
+if (email.trim() !== user.email) {
+  const { error: emailError } = await supabase.rpc('update_user_email', {
+    user_id: user.id,
+    new_email: email.trim()
+  })
+  if (emailError) { setError(emailError.message); setLoading(false); return }
+
+  await supabase
+    .from('profiles')
+    .update({ email: email.trim() })
+    .eq('id', user.id)
+}
 
     setMessage('Profile updated successfully!')
     setNewPassword('')
