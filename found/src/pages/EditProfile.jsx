@@ -89,7 +89,7 @@ export default function EditProfilePage() {
   .from('profiles')
   .upsert({ id: user.id, name: fullName })
   await supabase.auth.updateUser({
-  data: { name: fullName }
+  data: { full_name: fullName }
 })
 
     if (profileError) { setError(profileError.message); setLoading(false); return }
