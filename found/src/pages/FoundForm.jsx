@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../supabaseClient'
-
+import TrackReportModal from '../components/TrackReportModal'
 
 const FIELDS = [
   { id: 'name', name: 'name', label: 'Name', placeholder: 'Your name' },
@@ -26,6 +26,7 @@ export default function FoundForm() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
+  const [trackModalOpen, setTrackModalOpen] = useState(false)
 
   const previewUrls = useMemo(
     () => images.map((file) => (file ? URL.createObjectURL(file) : null)),
@@ -52,19 +53,9 @@ export default function FoundForm() {
     if (input) input.value = ''
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
+  const runSubmit = async (userId) => {
     setLoading(true)
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user?.id) {
-      setError('Please log in to submit a report.')
-      setLoading(false)
-      return
-    }
+    setError(null)
 
     const imageUrls = []
     for (const image of images) {
@@ -86,7 +77,7 @@ export default function FoundForm() {
     }
 
     const payload = {
-      user_id: user.id,
+      user_id: userId,
       name: formData.name,
       contact: formData.contact,
       what_found: formData.what_found,
@@ -113,105 +104,132 @@ export default function FoundForm() {
     setLoading(false)
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError(null)
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (session?.user?.id) {
+      await runSubmit(session.user.id)
+      return
+    }
+    setTrackModalOpen(true)
+  }
+
+  const handleContinueWithoutAccount = async () => {
+    setTrackModalOpen(false)
+    await runSubmit(null)
+  }
+
   if (success) return <p>Your item has been submitted!</p>
 
   return (
-    <form onSubmit={handleSubmit} className="found-form">
-      {error && <p className="found-form-error" role="alert">{error}</p>}
+    <>
+      <form onSubmit={handleSubmit} className="found-form">
+        {error && <p className="found-form-error" role="alert">{error}</p>}
 
-      {FIELDS.map(({ id, name, label, placeholder, type, optional }) => (
-        <Fragment key={id}>
-          <label htmlFor={id}>{label}</label>
-          <input
-            id={id}
-            name={name}
-            type={type || 'text'}
-            required={optional !== true}
-            placeholder={placeholder}
-            value={formData[name]}
-            onChange={handleChange}
-          />
-        </Fragment>
-      ))}
-
-      <div className="found-form-photos-wrap">
-        <label id="found-photos-label">
-          Photos <span className="found-form-hint">(at least one required)</span>
-        </label>
-        <input
-          className="found-form-photo-gate"
-          type="text"
-          name="photo_gate"
-          aria-label="Add at least one photo to continue"
-          tabIndex={-1}
-          autoComplete="off"
-          value={images.some(Boolean) ? 'ok' : ''}
-          onChange={() => { }}
-          required
-        />
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="dropzone"
-            onDrop={(e) => {
-              e.preventDefault()
-              setError(null)
-              const file = e.dataTransfer.files[0]
-              if (!file) return
-              const updated = [...images]
-              updated[i] = file
-              setImages(updated)
-            }}
-            onDragOver={(e) => e.preventDefault()}
-            onClick={() => document.getElementById(`image-upload-${i}`).click()}
-          >
+        {FIELDS.map(({ id, name, label, placeholder, type, optional }) => (
+          <Fragment key={id}>
+            <label htmlFor={id}>{label}</label>
             <input
-              id={`image-upload-${i}`}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={(e) => {
+              id={id}
+              name={name}
+              type={type || 'text'}
+              required={optional !== true}
+              placeholder={placeholder}
+              value={formData[name]}
+              onChange={handleChange}
+            />
+          </Fragment>
+        ))}
+
+        <div className="found-form-photos-wrap">
+          <label id="found-photos-label">
+            Photos <span className="found-form-hint">(at least one required)</span>
+          </label>
+          <input
+            className="found-form-photo-gate"
+            type="text"
+            name="photo_gate"
+            aria-label="Add at least one photo to continue"
+            tabIndex={-1}
+            autoComplete="off"
+            value={images.some(Boolean) ? 'ok' : ''}
+            onChange={() => { }}
+            required
+          />
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="dropzone"
+              onDrop={(e) => {
+                e.preventDefault()
                 setError(null)
-                const file = e.target.files[0]
+                const file = e.dataTransfer.files[0]
                 if (!file) return
                 const updated = [...images]
                 updated[i] = file
                 setImages(updated)
               }}
-            />
-            {images[i] ? (
-              <div className="dropzone-preview-wrap">
-                <img
-                  src={previewUrls[i]}
-                  alt={`Preview ${i + 1}`}
-                  className="dropzone-preview-img"
-                />
-                <button
-                  type="button"
-                  className="dropzone-clear"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    clearImage(i)
-                  }}
-                  aria-label={`Remove photo ${i + 1}`}
-                >
-                  ✕
-                </button>
-              </div>
-            ) : (
-              <>
-                <p className="dropzone-icon">📁</p>
-                <p className="dropzone-text">Photo {i + 1}</p>
-                <p className="dropzone-hint">drag & drop or click</p>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+              onDragOver={(e) => e.preventDefault()}
+              onClick={() => document.getElementById(`image-upload-${i}`).click()}
+            >
+              <input
+                id={`image-upload-${i}`}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  setError(null)
+                  const file = e.target.files[0]
+                  if (!file) return
+                  const updated = [...images]
+                  updated[i] = file
+                  setImages(updated)
+                }}
+              />
+              {images[i] ? (
+                <div className="dropzone-preview-wrap">
+                  <img
+                    src={previewUrls[i]}
+                    alt={`Preview ${i + 1}`}
+                    className="dropzone-preview-img"
+                  />
+                  <button
+                    type="button"
+                    className="dropzone-clear"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      clearImage(i)
+                    }}
+                    aria-label={`Remove photo ${i + 1}`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="dropzone-icon">📁</p>
+                  <p className="dropzone-text">Photo {i + 1}</p>
+                  <p className="dropzone-hint">drag & drop or click</p>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
 
-      <button type="submit" className="found-form-submit" disabled={loading}>
-        {loading ? 'Submitting...' : 'Submit'}
-      </button>
-    </form>
+        <button type="submit" className="found-form-submit" disabled={loading}>
+          {loading ? 'Submitting...' : 'Submit'}
+        </button>
+      </form>
+
+      <TrackReportModal
+        isOpen={trackModalOpen}
+        onClose={() => setTrackModalOpen(false)}
+        onContinueWithoutAccount={handleContinueWithoutAccount}
+      />
+    </>
   )
 }
