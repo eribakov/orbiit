@@ -741,6 +741,42 @@
   outline-offset: 2px;
 }
 
+.account-logout-wrap {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+
+.account-logout-btn {
+  padding: 0.55rem 1.35rem;
+  font-family: "Google Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-h);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+}
+
+.account-logout-btn:hover:not(:disabled) {
+  border-color: var(--logo-mid);
+  background: rgba(160, 100, 220, 0.06);
+}
+
+.account-logout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.account-logout-btn:focus-visible {
+  outline: 2px solid var(--logo-mid);
+  outline-offset: 2px;
+}
+
 .account-dashboard {
   padding-top: 1.5rem;
   width: 100%;

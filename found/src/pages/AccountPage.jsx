@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 
 function getInitials(fullName) {
@@ -21,7 +21,9 @@ function formatReportDate(value) {
 }
 
 export default function AccountPage() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('lost')
+  const [loggingOut, setLoggingOut] = useState(false)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [lostItems, setLostItems] = useState([])
@@ -123,6 +125,16 @@ export default function AccountPage() {
       date: formatReportDate(row.date_found),
     }))
   }, [activeTab, lostItems, foundItems])
+
+  const handleLogout = async () => {
+    setLoggingOut(true)
+    try {
+      await supabase.auth.signOut()
+      navigate('/')
+    } catch {
+      setLoggingOut(false)
+    }
+  }
 
   return (
     <div className="account-page">
@@ -239,6 +251,19 @@ export default function AccountPage() {
               )}
             </div>
           </section>
+        )}
+
+        {user && (
+          <div className="account-logout-wrap">
+            <button
+              type="button"
+              className="account-logout-btn"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
+              {loggingOut ? 'Logging out…' : 'Log out'}
+            </button>
+          </div>
         )}
       </div>
     </div>
