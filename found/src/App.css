@@ -614,3 +614,9 @@
   color: var(--accent);
   font-weight: 500;
 }
+.nav-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}

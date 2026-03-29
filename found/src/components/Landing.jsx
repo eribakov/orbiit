@@ -1,5 +1,4 @@
-export default function Landing({ onLostClick, onFoundClick }) {
-  return (
+export default function Landing({ onLostClick, onFoundClick, onLoginClick, onSignupClick, onAccountClick, user }) {  return (
     <main className="landing">
       <div className="orb" />
       <div className="ring ring-1" />
@@ -11,9 +10,17 @@ export default function Landing({ onLostClick, onFoundClick }) {
           <span className="nav-name">Orbiit</span>
         </div>
         <div className="nav-links">
-          <a href="https://instagram.com/orbiit_qu" target="_blank" rel="noreferrer" className="nav-link">Instagram</a>
-          <a href="mailto:orbiitsupport@gmail.com" className="nav-link">Contact Us</a>
-        </div>
+  <a href="https://instagram.com/orbiit_qu" target="_blank" rel="noreferrer" className="nav-link">Instagram</a>
+  <a href="mailto:orbiitsupport@gmail.com" className="nav-link">Contact Us</a>
+  {user ? (
+    <button onClick={onAccountClick} className="nav-link nav-link-btn">My Account</button>
+  ) : (
+    <>
+      <button onClick={onLoginClick} className="nav-link nav-link-btn">Log in</button>
+      <button onClick={onSignupClick} className="nav-link nav-link-btn">Sign up</button>
+    </>
+  )}
+</div>
       </nav>
 
       <div className="landing-content">
