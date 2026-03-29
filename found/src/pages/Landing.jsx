@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Landing({ onLostClick, onFoundClick }) {
   return (
     <main className="landing">
@@ -11,6 +13,9 @@ export default function Landing({ onLostClick, onFoundClick }) {
           <span className="nav-name">Orbiit</span>
         </div>
         <div className="nav-links">
+          <Link to="/account" className="nav-link">
+            Account
+          </Link>
           <a href="https://instagram.com/orbiit_qu" target="_blank" rel="noreferrer" className="nav-link">Instagram</a>
           <a href="mailto:orbiitsupport@gmail.com" className="nav-link">Contact Us</a>
         </div>

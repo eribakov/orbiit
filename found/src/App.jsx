@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import Landing from './components/Landing'
+import { Routes, Route } from 'react-router-dom'
+import Landing from './pages/Landing'
+import AccountPage from './pages/AccountPage'
 import Modal from './components/Modal'
-import LostForm from './components/LostForm'
-import FoundForm from './components/FoundForm'
+import LostForm from './pages/LostForm'
+import FoundForm from './pages/FoundForm'
 import './App.css'
 
-export default function App() {
+function HomePage() {
   const [modalMode, setModalMode] = useState(null)
 
   return (
@@ -26,5 +28,14 @@ export default function App() {
         {modalMode === 'found' ? <FoundForm /> : <LostForm />}
       </Modal>
     </>
+  )
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/account" element={<AccountPage />} />
+    </Routes>
   )
 }

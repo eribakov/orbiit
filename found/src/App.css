@@ -614,3 +614,312 @@
   color: var(--accent);
   font-weight: 500;
 }
+
+/* ========== AccountPage (desktop dashboard layout, max-width 1100px) ========== */
+.account-page {
+  width: 100%;
+  min-height: 100svh;
+  box-sizing: border-box;
+}
+
+.account-page-inner {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem 1.75rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.account-page-nav {
+  margin-bottom: 1rem;
+}
+
+.account-page-back {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--logo-mid);
+  text-decoration: none;
+  font-family: "Google Sans", sans-serif;
+}
+
+.account-page-back:hover {
+  text-decoration: underline;
+}
+
+.account-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding: 1rem 1.25rem 1.15rem;
+  margin: 0 0 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.account-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.account-header-text {
+  min-width: 0;
+}
+
+.account-avatar {
+  flex-shrink: 0;
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Google Sans", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--logo-mid), var(--logo-deep));
+}
+
+@media (min-width: 768px) {
+  .account-avatar {
+    width: 4.25rem;
+    height: 4.25rem;
+    font-size: 1.35rem;
+  }
+}
+
+.account-name {
+  margin: 0;
+  font-family: "Google Sans", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-h);
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .account-name {
+    font-size: 1.5rem;
+  }
+}
+
+.account-email {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.account-edit-btn {
+  flex-shrink: 0;
+  padding: 0.55rem 1.25rem;
+  font-family: "Google Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  background: linear-gradient(135deg, var(--logo-mid), var(--logo-deep));
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.account-edit-btn:hover {
+  opacity: 0.9;
+}
+
+.account-edit-btn:focus-visible {
+  outline: 2px solid var(--logo-mid);
+  outline-offset: 2px;
+}
+
+.account-dashboard {
+  padding-top: 1.5rem;
+  width: 100%;
+}
+
+.account-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+}
+
+.account-tab {
+  flex: 0 0 auto;
+  padding: 0.65rem 1.35rem;
+  margin-bottom: -1px;
+  font-family: "Google Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.account-tab:hover {
+  color: var(--text-h);
+}
+
+.account-tab--active {
+  color: var(--logo-deep);
+  border-bottom-color: var(--logo-mid);
+  box-shadow: none;
+  background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .account-tab--active {
+    color: var(--text-h);
+    border-bottom-color: var(--accent);
+  }
+}
+
+.account-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.account-report-panel {
+  width: 100%;
+}
+
+.account-report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .account-report-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1000px) {
+  .account-report-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.account-report-card {
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 1px 3px rgba(70, 50, 180, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.account-report-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
+}
+
+.account-report-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.account-report-title {
+  margin: 0;
+  font-family: "Google Sans", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-h);
+  line-height: 1.3;
+}
+
+.account-badge {
+  flex-shrink: 0;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+
+.account-badge--searching {
+  color: #b45309;
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.account-badge--matched {
+  color: var(--logo-deep);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.account-badge--resolved {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  .account-badge--searching {
+    color: #fcd34d;
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+
+  .account-badge--resolved {
+    color: #86efac;
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.35);
+  }
+}
+
+.account-report-meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.account-report-meta-row {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  align-items: baseline;
+}
+
+.account-report-meta dt {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.account-report-meta dd {
+  margin: 0;
+  color: var(--text-h);
+}
