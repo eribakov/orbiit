@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import { supabase } from './supabaseClient'
-import Landing from './components/Landing'
+import Landing from './pages/Landing'
+import AccountPage from './pages/AccountPage'
 import Modal from './components/Modal'
 import LostForm from './components/LostForm'
 import FoundForm from './components/FoundForm'
-import LoginPage from './components/LoginPage'
-import SignPage from './components/SignPage'
 import './App.css'
 
-export default function App() {
+function HomePage() {
   const [modalMode, setModalMode] = useState(null)
   const [page, setPage] = useState('landing')  
   const [user, setUser] = useState(null)
