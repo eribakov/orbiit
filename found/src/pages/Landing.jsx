@@ -1,7 +1,22 @@
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { supabase } from '../supabaseClient'
 
-export default function Landing({ onLostClick, onFoundClick, user }) {
+export default function Landing({ onLostClick, onFoundClick }) {
   const navigate = useNavigate()
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <main className="landing">
@@ -24,14 +39,9 @@ export default function Landing({ onLostClick, onFoundClick, user }) {
               My Account
             </button>
           ) : (
-            <>
-              <Link to="/auth" className="nav-link nav-link-btn">
-                Login / Sign up
-              </Link>
-              <Link to="/account" className="nav-link">
-                Account
-              </Link>
-            </>
+            <Link to="/auth" className="nav-link nav-link-btn">
+              Login / Sign up
+            </Link>
           )}
           <a
             href="https://instagram.com/orbiit_qu"

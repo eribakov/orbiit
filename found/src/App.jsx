@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { supabase } from './supabaseClient'
 import Landing from './pages/Landing'
 import AccountPage from './pages/AccountPage'
 import Modal from './components/Modal'
@@ -11,26 +10,12 @@ import './App.css'
 
 function HomePage() {
   const [modalMode, setModalMode] = useState(null)
-  const [user, setUser] = useState(null)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-    })
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
 
   return (
     <>
       <Landing
         onLostClick={() => setModalMode('lost')}
         onFoundClick={() => setModalMode('found')}
-        user={user}
       />
       <Modal
         isOpen={modalMode !== null}

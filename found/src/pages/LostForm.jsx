@@ -56,6 +56,15 @@ export default function LostForm() {
     setError(null)
     setLoading(true)
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user?.id) {
+      setError('Please log in to submit a report.')
+      setLoading(false)
+      return
+    }
+
     const imageUrls = []
     for (const image of images) {
       if (image) {
@@ -76,6 +85,7 @@ export default function LostForm() {
     }
 
     const payload = {
+      user_id: user.id,
       name: formData.name,
       contact: formData.contact,
       what_lost: formData.what_lost,
