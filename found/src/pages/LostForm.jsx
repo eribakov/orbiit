@@ -1,12 +1,17 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { supabase } from '../supabaseClient'
 import TrackReportModal from '../components/TrackReportModal'
+import {
+  contactLooksLikeEmail,
+  contactEmailBelongsToExistingAccount,
+} from '../components/guestContactCheck'
+import { ITEM_CATEGORIES, ITEMS_BY_CATEGORY } from '../components/itemCategoryOptions'
 
 const FIELDS = [
   { id: 'name', name: 'name', label: 'Name', placeholder: 'Your name' },
   { id: 'contact', name: 'contact', label: 'Contact info', placeholder: 'Email' },
-  { id: 'what_lost', name: 'what_lost', label: 'What did you lose?', placeholder: 'e.g. keys, wallet, bag' },
   { id: 'item_desc', name: 'item_desc', label: 'Item description', placeholder: 'Give a brief description of your item' },
   { id: 'lost_location', name: 'lost_location', label: 'Where did you lose it?', placeholder: 'e.g. Central Park, bus line 42' },
   { id: 'date_lost', name: 'date_lost', label: 'Date lost (optional)', type: 'date', optional: true },
@@ -15,6 +20,7 @@ const FIELDS = [
 const emptyForm = () => ({
   name: '',
   contact: '',
+  category: '',
   what_lost: '',
   item_desc: '',
   lost_location: '',
@@ -67,6 +73,11 @@ export default function LostForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const handleCategoryChange = (e) => {
+    setError(null)
+    setFormData({ ...formData, category: e.target.value, what_lost: '' })
+  }
+
   const clearImage = (i) => {
     setError(null)
     const u = [...images]
@@ -79,6 +90,20 @@ export default function LostForm() {
   const performSubmit = async (userId) => {
     setLoading(true)
     setError(null)
+
+    if (!userId && contactLooksLikeEmail(formData.contact)) {
+      const exists = await contactEmailBelongsToExistingAccount(formData.contact)
+      if (exists) {
+        setError(
+          <>
+            Looks like you already have an account with us. Please log in to track your report.{' '}
+            <Link to="/auth">Log in</Link>
+          </>,
+        )
+        setLoading(false)
+        return
+      }
+    }
 
     const imageUrls = []
     for (const image of images) {
@@ -103,6 +128,7 @@ export default function LostForm() {
       user_id: userId ?? null,
       name: formData.name,
       contact: formData.contact,
+      category: formData.category,
       what_lost: formData.what_lost,
       item_desc: formData.item_desc,
       lost_location: formData.lost_location,
@@ -127,7 +153,7 @@ export default function LostForm() {
             {
               to_email: formData.contact,
               name: formData.name,
-              item: formData.what_lost,
+              item: `${formData.category} — ${formData.what_lost}`,
               location: formData.lost_location,
               date: formData.date_lost || 'Not specified',
             },
@@ -169,9 +195,76 @@ export default function LostForm() {
           await performSubmit(null)
         }}
       />
-      {error && <p className="lost-form-error" role="alert">{error}</p>}
+      {error && (
+        <div className="lost-form-error" role="alert">
+          {error}
+        </div>
+      )}
 
-      {FIELDS.map(({ id, name, label, placeholder, type, optional }) => {
+      {FIELDS.slice(0, 2).map(({ id, name, label, placeholder, type, optional }) => {
+        const isAutoFilled = user && (name === 'name' || name === 'contact')
+        return (
+          <Fragment key={id}>
+            <label htmlFor={id}>
+              {label}
+              {isAutoFilled && (
+                <span style={{ fontSize: '0.75rem', opacity: 0.5, marginLeft: '0.4rem' }}>
+                  (auto-filled)
+                </span>
+              )}
+            </label>
+            <input
+              id={id}
+              name={name}
+              type={type || 'text'}
+              required={!optional}
+              placeholder={placeholder}
+              value={formData[name]}
+              onChange={handleChange}
+              readOnly={isAutoFilled}
+              style={isAutoFilled ? { opacity: 0.7, cursor: 'default' } : {}}
+            />
+          </Fragment>
+        )
+      })}
+
+      <Fragment key="lost-category-item">
+        <label htmlFor="lost-item-category">Category</label>
+        <select
+          id="lost-item-category"
+          name="category"
+          value={formData.category}
+          onChange={handleCategoryChange}
+          required
+        >
+          <option value="">Select a category</option>
+          {ITEM_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="lost-item-specific">Item</label>
+        <select
+          id="lost-item-specific"
+          name="what_lost"
+          value={formData.what_lost}
+          onChange={handleChange}
+          required
+          disabled={!formData.category}
+        >
+          <option value="">
+            {formData.category ? 'Select an item' : 'Select a category first'}
+          </option>
+          {(ITEMS_BY_CATEGORY[formData.category] || []).map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+      </Fragment>
+
+      {FIELDS.slice(2).map(({ id, name, label, placeholder, type, optional }) => {
         const isAutoFilled = user && (name === 'name' || name === 'contact')
         return (
           <Fragment key={id}>

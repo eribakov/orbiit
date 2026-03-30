@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 
+function isDuplicateSignupError(error) {
+  if (!error?.message) return false
+  const m = error.message.toLowerCase()
+  return (
+    m.includes('already registered') ||
+    m.includes('already been registered') ||
+    m.includes('user already exists') ||
+    m.includes('email address is already') ||
+    m.includes('already in use')
+  )
+}
+
 const authStyles = `
   .auth-page {
     position: relative;
@@ -158,6 +170,21 @@ export default function AuthPage() {
         data: { name: fullName.trim() },
       },
     })
+
+    const duplicateUser =
+      (signUpError && isDuplicateSignupError(signUpError)) ||
+      (data?.user &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0)
+
+    if (duplicateUser) {
+      setPassword('')
+      setConfirmPassword('')
+      setLoading(false)
+      navigate('/auth', { replace: true })
+      setError('Looks like you already have an account. Please log in instead.')
+      return
+    }
 
     if (signUpError) {
       setError(signUpError.message)
