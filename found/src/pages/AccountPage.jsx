@@ -248,7 +248,7 @@ function LostItemModal({ item, onClose, onSave, onNotMine, onStatusChange }) {
             <label className="item-modal-field-label" htmlFor="lost-modal-what">Item name</label>
             <input id="lost-modal-what" name="what_lost" className="item-modal-input"
               value={form.what_lost} onChange={handleChange} placeholder="e.g. keys, wallet, bag"
-              disabled={isReturned} readOnly={isReturned} />
+              disabled={true} readOnly={true} />
             <label className="item-modal-field-label" htmlFor="lost-modal-desc">Description</label>
             <textarea id="lost-modal-desc" name="item_desc" className="item-modal-input item-modal-textarea"
               value={form.item_desc} onChange={handleChange} placeholder="Describe your item"
@@ -271,7 +271,7 @@ function LostItemModal({ item, onClose, onSave, onNotMine, onStatusChange }) {
             <button type="button" className="item-modal-save" onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save changes'}
             </button>
-            {item.hasMatch && item.matchedLost && !isReturned && (
+            {item.hasMatch && (
               <button type="button" className="item-modal-not-mine" onClick={handleNotMine}
                 disabled={notMineLoading}>
                 {notMineLoading ? '…' : "This isn't mine"}
@@ -372,7 +372,7 @@ function FoundItemModal({ item, onClose, onSave }) {
             <label className="item-modal-field-label" htmlFor="found-modal-what">Item found</label>
             <input id="found-modal-what" name="what_found" className="item-modal-input"
               value={form.what_found} onChange={handleChange} placeholder="e.g. keys, wallet, bag"
-              disabled={isReturned} readOnly={isReturned} />
+              disabled={true} readOnly={true} />
             <label className="item-modal-field-label" htmlFor="found-modal-desc">Description</label>
             <textarea id="found-modal-desc" name="item_desc" className="item-modal-input item-modal-textarea"
               value={form.item_desc} onChange={handleChange} placeholder="Describe the item" rows={3}
