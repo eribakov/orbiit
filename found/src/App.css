@@ -390,6 +390,28 @@
   box-shadow: 0 0 0 2px var(--accent-bg);
 }
 
+.lost-form select {
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.lost-form select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+.lost-form select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .lost-form-submit {
   margin-top: 0.5rem;
   padding: 0.7rem 1.25rem;
@@ -421,6 +443,16 @@
   background: rgba(185, 28, 28, 0.08);
   border: 1px solid rgba(185, 28, 28, 0.25);
   text-align: left;
+}
+
+.lost-form-error a {
+  color: var(--logo-mid);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.lost-form-error a:hover {
+  opacity: 0.85;
 }
 
 /* ========== FoundForm ========== */
@@ -476,6 +508,28 @@
   box-shadow: 0 0 0 2px var(--accent-bg);
 }
 
+.found-form select {
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.found-form select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+.found-form select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .found-form-error {
   margin: 0 0 0.5rem;
   padding: 0.5rem 0.75rem;
@@ -485,6 +539,16 @@
   background: rgba(185, 28, 28, 0.08);
   border: 1px solid rgba(185, 28, 28, 0.25);
   text-align: left;
+}
+
+.found-form-error a {
+  color: var(--logo-mid);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.found-form-error a:hover {
+  opacity: 0.85;
 }
 
 .found-form-submit {

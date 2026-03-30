@@ -2,6 +2,51 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 
+function isDuplicateSignupError(error) {
+  if (!error?.message) return false
+  const m = error.message.toLowerCase()
+  return (
+    m.includes('already registered') ||
+    m.includes('already been registered') ||
+    m.includes('user already exists') ||
+    m.includes('email address is already') ||
+    m.includes('already in use')
+  )
+}
+
+function getFriendlyAuthError(message, code) {
+  const raw = String(message ?? '')
+  const m = raw.toLowerCase()
+  const c = String(code ?? '').toLowerCase()
+
+  if (m.includes('password should contain')) {
+    return 'Password must include at least one uppercase letter and one number.'
+  }
+  if (m.includes('invalid login credentials')) {
+    return 'Incorrect email or password. Please try again.'
+  }
+  if (m.includes('email not confirmed')) {
+    return 'Please confirm your email before logging in.'
+  }
+  if (m.includes('too many requests')) {
+    return 'Too many attempts. Please wait a moment and try again.'
+  }
+  if (m.includes('user already registered')) {
+    return 'Looks like you already have an account. Please log in instead.'
+  }
+  if (
+    c === 'signup_disabled' ||
+    m.includes('signup_disabled') ||
+    m.includes('signups not allowed')
+  ) {
+    return 'Sign ups are currently disabled. Please try again later.'
+  }
+  if (m.includes('invalid email')) {
+    return 'Please enter a valid email address.'
+  }
+  return 'Something went wrong. Please try again.'
+}
+
 const authStyles = `
   .auth-page {
     position: relative;
@@ -126,7 +171,7 @@ export default function AuthPage() {
     }
     setLoading(true)
     const { error: err } = await supabase.auth.signInWithPassword({ email, password })
-    if (err) setError(err.message)
+    if (err) setError(getFriendlyAuthError(err.message, err.code))
     else navigate('/')
     setLoading(false)
   }
@@ -159,8 +204,28 @@ export default function AuthPage() {
       },
     })
 
+    const duplicateUser =
+      (signUpError && isDuplicateSignupError(signUpError)) ||
+      (data?.user &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0)
+
+    if (duplicateUser) {
+      setPassword('')
+      setConfirmPassword('')
+      setLoading(false)
+      navigate('/auth', { replace: true })
+      setError(
+        getFriendlyAuthError(
+          signUpError?.message ?? 'User already registered',
+          signUpError?.code,
+        ),
+      )
+      return
+    }
+
     if (signUpError) {
-      setError(signUpError.message)
+      setError(getFriendlyAuthError(signUpError.message, signUpError.code))
       setLoading(false)
       return
     }
@@ -183,7 +248,7 @@ export default function AuthPage() {
       provider: 'google',
       options: { redirectTo: window.location.origin },
     })
-    if (err) setError(err.message)
+    if (err) setError(getFriendlyAuthError(err.message, err.code))
   }
 
   const googleSvg = (
