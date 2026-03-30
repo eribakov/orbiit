@@ -91,10 +91,6 @@ const handleSave = async () => {
 
     if (profileError) { setError(profileError.message); setLoading(false); return }
 
-    const { error: authError } = await supabase.auth.updateUser({
-      data: { full_name: fullName }
-    })
-    if (authError) { setError(authError.message); setLoading(false); return }
 if (email.trim() !== user.email) {
   const { error: emailError } = await supabase.rpc('update_user_email', {
     user_id: user.id,
